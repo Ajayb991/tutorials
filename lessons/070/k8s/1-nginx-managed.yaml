@@ -1,23 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-managed
-  namespace: default
+  name: react-portfolio-deployment
+  labels:
+    app: react-portfolio
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: nginx-managed
+      app: react-portfolio
   template:
     metadata:
       labels:
-        app: nginx-managed
+        app: react-portfolio
     spec:
       containers:
-      - name: nginx-managed
-        image: nginx:1.14.2
+      - name: react-portfolio
+        image: ajaysinghb/my-react-app:latest
         ports:
-        - containerPort: 80
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -27,14 +33,3 @@ spec:
                 operator: In
                 values:
                 - managed-nodes
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - nginx-managed
-            topologyKey: kubernetes.io/hostname
-            namespaces:
-            - default
